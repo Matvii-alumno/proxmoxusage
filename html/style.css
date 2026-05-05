@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+:root {
+    --bg-main: #0f172a;
+    --bg-card: #1e293b;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --border: rgba(255, 255, 255, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+    transition: all 0.2s ease-in-out;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: var(--text-primary);
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.button-group button {
+    width: auto;             
+    min-width: 90px;
+    padding: 8px 16px;
+    background: #334155;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.button-group button:hover {
+    background: #475569;
+    color: white;
+}
+
+.button-group button.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+}
+
+.actions-container {
+    display: flex;
+    justify-content: center; /* Centra el botón azul */
+    margin: 30px 0;
+    width: 100%;
+}
+
+#btn-snapshot {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 40px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+    width: auto;
+    min-width: 300px;
+}
+
+#btn-snapshot:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-2px);
+}
+
+.processes-container {
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: var(--text-secondary);
+    padding: 15px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid var(--accent);
+    text-align: center; 
+}
+
+td {
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+    text-align: center; 
+}
+
+th:first-child, td:first-child {
+    text-align: left;
+    padding-left: 25px;
+}
+
+tr:hover td {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+#chart, #metricsChart {
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 30px;
+}
+
+.actions-container {
+    display: flex;
+    justify-content: flex-end;   
+    margin-top: -10px;           
+    margin-bottom: 15px;         
+}
+
+.top-right-actions {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.refresh-label {
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.custom-select {
+    background-color: #1e293b;
+    color: white;
+    border: 1px solid #334155;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.custom-select:hover {
+    background-color: #334155;
+    border-color: #3b82f6;
+}
+
+h1 {
+    margin-right: 200px; 
+}
+
+@media (max-width: 600px) {
+    .top-right-actions {
+        position: static;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    h1 { margin-right: 0; }
+}
+
+.docker-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.docker-table th, .docker-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.docker-table tr:hover td {
+    background: rgba(255,255,255,0.03);
+}
+
+.docker-message {
+    background: #1e90ff;
+    color: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    display: none;
+}
+

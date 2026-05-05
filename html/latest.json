@@ -1,0 +1,428 @@
+[
+  {
+    "date": "2026-04-28 10:55:01",
+    "cpu": 4.3,
+    "ram_used": 9330,
+    "ram_total": 23906,
+    "disk": 13,
+    "rx": 2465709221,
+    "tx": 78077324,
+    "load": 0.54,
+    "swap": 0,
+    "top_list": [
+      {
+        "name": "bundle",
+        "cpu": 18.1,
+        "ram": 1363.39
+      },
+      {
+        "name": "chrome",
+        "cpu": 9.8,
+        "ram": 472.58
+      },
+      {
+        "name": "gnome-shell",
+        "cpu": 3.6,
+        "ram": 300.82
+      },
+      {
+        "name": "chrome",
+        "cpu": 3.5,
+        "ram": 205.52
+      },
+      {
+        "name": "firefox",
+        "cpu": 3.3,
+        "ram": 433.47
+      },
+      {
+        "name": "Xorg",
+        "cpu": 2.9,
+        "ram": 106.18
+      },
+      {
+        "name": "gedit",
+        "cpu": 2.8,
+        "ram": 93.45
+      },
+      {
+        "name": "chrome",
+        "cpu": 2.6,
+        "ram": 327.67
+      },
+      {
+        "name": "chrome",
+        "cpu": 2.2,
+        "ram": 399.39
+      },
+      {
+        "name": "prometheus",
+        "cpu": 1.5,
+        "ram": 408.35
+      }
+    ]
+  },
+  {
+    "date": "2026-04-28 10:56:01",
+    "cpu": 6,
+    "ram_used": 9355,
+    "ram_total": 23906,
+    "disk": 13,
+    "rx": 2465727130,
+    "tx": 78080561,
+    "load": 0.34,
+    "swap": 0,
+    "top_list": [
+      {
+        "name": "bundle",
+        "cpu": 18.1,
+        "ram": 1361.66
+      },
+      {
+        "name": "chrome",
+        "cpu": 9.7,
+        "ram": 474.14
+      },
+      {
+        "name": "gnome-shell",
+        "cpu": 3.6,
+        "ram": 300.85
+      },
+      {
+        "name": "chrome",
+        "cpu": 3.5,
+        "ram": 205.52
+      },
+      {
+        "name": "firefox",
+        "cpu": 3.0,
+        "ram": 432.18
+      },
+      {
+        "name": "Xorg",
+        "cpu": 2.9,
+        "ram": 106.18
+      },
+      {
+        "name": "gedit",
+        "cpu": 2.7,
+        "ram": 93.45
+      },
+      {
+        "name": "chrome",
+        "cpu": 2.5,
+        "ram": 327.58
+      },
+      {
+        "name": "chrome",
+        "cpu": 2.2,
+        "ram": 399.56
+      },
+      {
+        "name": "prometheus",
+        "cpu": 1.5,
+        "ram": 423.61
+      }
+    ]
+  },
+  {
+    "date": "2026-04-28 10:57:01",
+    "cpu": 22.7,
+    "ram_used": 9367,
+    "ram_total": 23906,
+    "disk": 13,
+    "rx": 2465792139,
+    "tx": 78127203,
+    "load": 0.2,
+    "swap": 0,
+    "top_list": [
+      {
+        "name": "bundle",
+        "cpu": 18.1,
+        "ram": 1363.39
+      },
+      {
+        "name": "chrome",
+        "cpu": 9.6,
+        "ram": 474.29
+      },
+      {
+        "name": "gnome-shell",
+        "cpu": 3.6,
+        "ram": 300.85
+      },
+      {
+        "name": "chrome",
+        "cpu": 3.4,
+        "ram": 205.52
+      },
+      {
+        "name": "Xorg",
+        "cpu": 2.9,
+        "ram": 106.18
+      },
+      {
+        "name": "gedit",
+        "cpu": 2.7,
+        "ram": 93.45
+      },
+      {
+        "name": "firefox",
+        "cpu": 2.6,
+        "ram": 432.32
+      },
+      {
+        "name": "chrome",
+        "cpu": 2.5,
+        "ram": 327.97
+      },
+      {
+        "name": "chrome",
+        "cpu": 2.1,
+        "ram": 400.31
+      },
+      {
+        "name": "prometheus",
+        "cpu": 1.5,
+        "ram": 423.68
+      }
+    ]
+  },
+  {
+    "date": "2026-04-28 10:58:01",
+    "cpu": 4.3,
+    "ram_used": 9370,
+    "ram_total": 23906,
+    "disk": 13,
+    "rx": 2465850312,
+    "tx": 78130477,
+    "load": 0.14,
+    "swap": 0,
+    "top_list": [
+      {
+        "name": "bundle",
+        "cpu": 18.1,
+        "ram": 1361.54
+      },
+      {
+        "name": "chrome",
+        "cpu": 9.5,
+        "ram": 473.05
+      },
+      {
+        "name": "gnome-shell",
+        "cpu": 3.5,
+        "ram": 300.8
+      },
+      {
+        "name": "chrome",
+        "cpu": 3.4,
+        "ram": 205.52
+      },
+      {
+        "name": "Xorg",
+        "cpu": 2.9,
+        "ram": 106.18
+      },
+      {
+        "name": "gedit",
+        "cpu": 2.7,
+        "ram": 93.45
+      },
+      {
+        "name": "chrome",
+        "cpu": 2.5,
+        "ram": 327.55
+      },
+      {
+        "name": "firefox",
+        "cpu": 2.3,
+        "ram": 432.4
+      },
+      {
+        "name": "chrome",
+        "cpu": 2.1,
+        "ram": 398.85
+      },
+      {
+        "name": "prometheus",
+        "cpu": 1.5,
+        "ram": 410.15
+      }
+    ]
+  },
+  {
+    "date": "2026-04-28 10:59:01",
+    "cpu": 33.3,
+    "ram_used": 9325,
+    "ram_total": 23906,
+    "disk": 13,
+    "rx": 2465915325,
+    "tx": 78146704,
+    "load": 0.17,
+    "swap": 0,
+    "top_list": [
+      {
+        "name": "bundle",
+        "cpu": 18.1,
+        "ram": 1361.16
+      },
+      {
+        "name": "chrome",
+        "cpu": 9.4,
+        "ram": 472.5
+      },
+      {
+        "name": "gnome-shell",
+        "cpu": 3.5,
+        "ram": 300.81
+      },
+      {
+        "name": "chrome",
+        "cpu": 3.4,
+        "ram": 205.48
+      },
+      {
+        "name": "Xorg",
+        "cpu": 2.9,
+        "ram": 106.18
+      },
+      {
+        "name": "gedit",
+        "cpu": 2.6,
+        "ram": 93.45
+      },
+      {
+        "name": "chrome",
+        "cpu": 2.5,
+        "ram": 327.54
+      },
+      {
+        "name": "chrome",
+        "cpu": 2.1,
+        "ram": 398.9
+      },
+      {
+        "name": "firefox",
+        "cpu": 2.0,
+        "ram": 432.4
+      },
+      {
+        "name": "prometheus",
+        "cpu": 1.5,
+        "ram": 410.32
+      }
+    ]
+  },
+  {
+    "date": "2026-04-28 11:00:01",
+    "cpu": 4.3,
+    "ram_used": 9345,
+    "ram_total": 23906,
+    "disk": 13,
+    "rx": 2465935091,
+    "tx": 78148809,
+    "load": 0.2,
+    "swap": 0,
+    "top_list": [
+      {
+        "name": "bundle",
+        "cpu": 18.1,
+        "ram": 1361.73
+      },
+      {
+        "name": "chrome",
+        "cpu": 9.3,
+        "ram": 472.5
+      },
+      {
+        "name": "gnome-shell",
+        "cpu": 3.5,
+        "ram": 300.82
+      },
+      {
+        "name": "chrome",
+        "cpu": 3.3,
+        "ram": 205.48
+      },
+      {
+        "name": "Xorg",
+        "cpu": 2.8,
+        "ram": 106.18
+      },
+      {
+        "name": "gedit",
+        "cpu": 2.6,
+        "ram": 93.45
+      },
+      {
+        "name": "chrome",
+        "cpu": 2.4,
+        "ram": 327.54
+      },
+      {
+        "name": "chrome",
+        "cpu": 2.1,
+        "ram": 400.43
+      },
+      {
+        "name": "firefox",
+        "cpu": 1.8,
+        "ram": 432.4
+      },
+      {
+        "name": "prometheus",
+        "cpu": 1.5,
+        "ram": 410.34
+      }
+    ]
+  },
+  {
+    "date": "2026-04-28 11:01:01",
+    "cpu": 37.9,
+    "ram_used": 9401,
+    "ram_total": 23906,
+    "disk": 13,
+    "rx": 2466006257,
+    "tx": 78208836,
+    "load": 0.25,
+    "swap": 0,
+    "top_list": [
+      {
+        "name": "bundle",
+        "cpu": 18.11,
+        "ram": 1361.98
+      },
+      {
+        "name": "chrome",
+        "cpu": 4.38,
+        "ram": 351.49
+      },
+      {
+        "name": "gnome-shell",
+        "cpu": 3.54,
+        "ram": 300.82
+      },
+      {
+        "name": "Xorg",
+        "cpu": 2.87,
+        "ram": 106.18
+      },
+      {
+        "name": "gedit",
+        "cpu": 2.67,
+        "ram": 93.45
+      },
+      {
+        "name": "firefox",
+        "cpu": 2.39,
+        "ram": 431.84
+      },
+      {
+        "name": "prometheus",
+        "cpu": 1.5,
+        "ram": 416.75
+      }
+    ]
+  }
+]

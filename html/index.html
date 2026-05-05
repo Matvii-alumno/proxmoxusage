@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css?v=1.1">
+  <title>Proxmox Usage</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+   <h1>Proxmox Usage</h1>
+   <div class="button-group">
+      <button onclick="showChart('cpu')" id="btn-cpu">CPU</button>
+      <button onclick="showChart('ram')" id="btn-ram">RAM</button>
+      <button onclick="showChart('disk')" id="btn-disk">DISK</button>
+      <button onclick="showChart('net')" id="btn-net">NETWORK</button>
+      <button onclick="showChart('load')" id="btn-load">LOAD</button>
+      <button onclick="showChart('swap')" id="btn-swap">SWAP</button>
+      <button onclick="showChart('proc')" id="btn-proc">TOP PROCESS</button>
+      <button onclick="showChart('sys')" id="btn-sys">SYSTEM INFO</button>
+      <button onclick="showChart('docker')">DOCKER</button>
+   </div>
+<div class="actions-container">
+    <button id="btn-snapshot" onclick="snapshotMetrics()">
+        CAPTURE CURRENT STATUS
+    </button>
+</div>
+<div class="top-right-actions">
+    <label for="auto-refresh" class="refresh-label">REFRESH:</label>
+    <select id="auto-refresh" class="custom-select">
+        <option value="0">Auto OFF</option>
+        <option value="1000">Every 1 second</option>
+        <option value="5000">Every 5 seconds</option>
+        <option value="30000">Every 30 seconds</option>
+        <option value="60000">Every 1 minute</option>
+        <option value="300000">Every 5 minutes</option>
+        <option value="900000">Every 15 minutes</option>
+        <option value="3600000">Every 1 hour</option>
+        <option value="86400000">Every 1 day</option>
+    </select>
+</div>
+
+   <canvas id="chart"></canvas>
+
+<script>
+let chart;
+let globalData;
+
+// Configuración visual de los puntos de la gráfica
+const pointSettings = {
+    pointRadius: 8,
+    pointHoverRadius: 12,
+    pointBorderColor: '#fff',
+    pointBorderWidth: 2,
+    tension: 0.4
+};
+
+function captureStatus() {
+    fetch('capture.php');   // este archivo ya existe en tu proyecto
+}
+
+function card(title, value) {
+    return `
+        <div style="
+            background:#1e293b;
+            padding:15px;
+            border-radius:10px;
+            color:white;
+            box-shadow:0 4px 10px rgba(0,0,0,0.3);
+        ">
+            <div style="font-size:12px; color:#94a3b8;">${title}</div>
+            <div style="font-size:18px; font-weight:bold; margin-top:5px;">
+                ${value}
+            </div>
+        </div>
+    `;
+}
+
+async function loadData() {
+    try {
+        const response = await fetch('latest.json?t=' + new Date().getTime());
+        globalData = await response.json();
+        showChart('cpu'); // Arranca con la gráfica de CPU
+    } catch (e) { 
+        console.error("Error cargando latest.json:", e); 
+    }
+}
+
+let autoInterval = null;
+
+document.getElementById('auto-refresh').addEventListener('change', function() {
+    const ms = parseInt(this.value);
+
+    if (autoInterval) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+    }
+
+    if (ms === 0) return;
+
+    autoInterval = setInterval(() => {
+        snapshotMetrics();   // SOLO ESTO
+    }, ms);
+});
+
+
+async function refreshProc() {
+    const btn = document.getElementById('btn-refresh-live'); // O el ID de tu botón
+    btn.innerText = "SEARCHING FOR PROCESSES";
+
+    try {
+        // Llamamos al PHP (que ejecuta el comando ps ahora mismo)
+        const response = await fetch('refresh.php');
+        const data = await response.json();
+
+        // Buscamos la tabla y la actualizamos
+        const tbody = document.querySelector("#table-container tbody");
+        if (tbody && data.top_list) {
+            tbody.innerHTML = data.top_list.map(p => `
+                <tr style="border-bottom: 1px solid #475569;">
+                    <td style="padding:10px;">${p.name}</td>
+                    <td style="padding:10px; text-align:center;">${p.cpu}%</td>
+                    <td style="padding:10px; text-align:center;">${p.ram.toFixed(2)} MB</td>
+                </tr>
+            `).join('');
+            
+            btn.innerText = "UPDATED: " + data.date;
+            setTimeout(() => { btn.innerText = "UPDATE NOW"; }, 2000);
+        }
+    } catch (e) {
+        btn.innerText = "ERROR DE CONEXIÓN";
+        console.error("Error:", e);
+    }
+}
+
+function showChart(type) {
+    if (!globalData) return;
+
+    // 1. Referencias a todos los contenedores posibles
+    const canvas = document.getElementById('chart');
+    let tableContainer = document.getElementById('table-container');
+    let dockerContainer = document.getElementById('docker-container');
+    let sysContainer = document.getElementById('system-container');
+
+    // 2. LIMPIEZA INICIAL: Ocultamos TODO por defecto
+    // Esto evita que Docker aparezca debajo de los procesos (error en image_aa7e59.png)
+    if (canvas) canvas.style.display = 'none';
+    if (tableContainer) tableContainer.style.display = 'none';
+    if (dockerContainer) dockerContainer.style.display = 'none';
+    if (sysContainer) sysContainer.style.display = 'none';
+
+    // 3. Lógica para DOCKER
+    if (type === 'docker') {
+        if (!dockerContainer) {
+            dockerContainer = document.createElement('div');
+            dockerContainer.id = 'docker-container';
+            canvas.after(dockerContainer);
+        }
+        dockerContainer.style.display = 'block';
+        
+        // Cargamos los datos
+        fetch('docker_info.php')
+            .then(res => res.json())
+            .then(data => {
+                dockerContainer.innerHTML = `
+                    <h2 style="text-align:center; color:#3b82f6;">DOCKER</h2>
+                    <h3>Contenedores</h3>
+                    ${renderDockerContainers(data.containers, data.stats)}
+                    <h3>Imágenes</h3>
+                    ${renderDockerImages(data.images)}
+                `;
+            });
+        return;
+    }
+
+    // 4. Lógica para SYSTEM INFO (sys)
+    if (type === 'sys') {
+        if (!sysContainer) {
+            sysContainer = document.createElement('div');
+            sysContainer.id = 'system-container';
+            canvas.after(sysContainer);
+        }
+        sysContainer.style.display = 'block';
+
+        fetch('system_info.php?t=' + new Date().getTime())
+            .then(res => res.json())
+            .then(data => {
+                let cpuParts = data.cpu_model.split("CPU @");
+                let procesador = cpuParts[0].trim();
+                let velocidad = cpuParts[1] ? cpuParts[1].trim() : "N/A";
+
+                sysContainer.innerHTML = `
+                    <h2 style="text-align:center; color:#3b82f6; margin-top:20px;">SYSTEM INFORMATION</h2>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap:15px; margin-top:20px;">
+                        ${card("HOSTNAME", data.hostname)}
+                        ${card("OS", data.os)}
+                        ${card("KERNEL", data.kernel)}
+                        ${card("UPTIME", data.uptime)}
+                        ${card("PROCESSOR", procesador)}
+                        ${card("CPU", velocidad)}
+                        ${card("CORES", data.cpu_cores)}
+                        ${card("DISK", data.disk)}
+                        ${card("CPU VENDOR", data.cpu_vendor)}
+                        ${card("THREADS/CORE", data.cpu_threads_per_core)}
+                    </div>
+                `;
+            });
+        return;
+    }
+
+    // 5. Lógica para TABLA DE PROCESOS (proc)
+    if (type === 'proc') {
+        if (!tableContainer) {
+            tableContainer = document.createElement('div');
+            tableContainer.id = 'table-container';
+            canvas.after(tableContainer);
+        }
+        tableContainer.style.display = 'block';
+
+        const lastEntry = globalData[globalData.length - 1];
+        const topList = (lastEntry && lastEntry.top_list) ? lastEntry.top_list : [];
+
+        tableContainer.innerHTML = `
+            <h3 style="text-align:center; color:#3b82f6; margin-top:20px;">Processes with the highest energy consumption</h3>
+            <table style="width:100%; border-collapse: collapse; color:white; background:#1e293b; border-radius:10px; margin-top:10px;">
+                <thead style="background:#334155;">
+                    <tr>
+                        <th style="padding:12px; text-align:left;">Program</th>
+                        <th style="padding:12px;">CPU %</th>
+                        <th style="padding:12px;">RAM MB</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body-content">
+                    ${topList.length > 0 ? topList.map(p => `
+                        <tr style="border-bottom: 1px solid #475569;">
+                            <td style="padding:10px;">${p.name}</td>
+                            <td style="padding:10px; text-align:center;">${p.cpu}%</td>
+                            <td style="padding:10px; text-align:center;">${p.ram.toFixed(2)} MB</td>
+                        </tr>
+                    `).join('') : '<tr><td colspan="3" style="padding:20px; text-align:center;">Loading processes</td></tr>'}
+                </tbody>
+            </table>
+            <button onclick="refreshProc()" id="btn-refresh-live" style="margin-top:20px; width:100%; padding:15px; background:#3b82f6; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; font-size:16px;">UPDATE CURRENT LOAD</button>
+        `;
+
+        if (topList.length === 0) refreshProc();
+        return;
+    }
+
+    // 6. Lógica para GRÁFICAS (Chart.js)
+    // Si no es docker, ni sys, ni proc, entonces es una gráfica
+    canvas.style.display = 'block';
+
+    const labels = globalData.map(d => d.date);
+    let datasets = [];
+
+    if (type === 'net') {
+        const rx = globalData.map((d, i) => (i === 0 ? 0 : Math.max(0, (d.rx - globalData[i-1].rx) / 1024)));
+        const tx = globalData.map((d, i) => (i === 0 ? 0 : Math.max(0, (d.tx - globalData[i-1].tx) / 1024)));
+        datasets = [
+            { label: 'RX KB', data: rx, ...pointSettings, borderColor: '#3b82f6' },
+            { label: 'TX KB', data: tx, ...pointSettings, borderColor: '#ef4444' }
+        ];
+    } else {
+        let dataValues, labelName, color;
+        if (type === 'cpu') { dataValues = globalData.map(d => d.cpu); labelName = 'CPU %'; color = '#3b82f6'; }
+        else if (type === 'ram') { dataValues = globalData.map(d => d.ram_used); labelName = 'RAM MB'; color = '#10b981'; }
+        else if (type === 'disk') { dataValues = globalData.map(d => d.disk); labelName = 'DISK %'; color = '#f59e0b'; }
+        else if (type === 'load') { dataValues = globalData.map(d => d.load); labelName = 'Load Average'; color = '#ef4444'; }
+        else if (type === 'swap') { dataValues = globalData.map(d => d.swap); labelName = 'Swap MB'; color = '#14b8a6'; }
+
+        const warningThreshold = (type === 'cpu' || type === 'disk') ? 80 : null;
+
+        datasets = [{
+            label: labelName,
+            data: dataValues,
+            borderColor: color,
+            backgroundColor: color + '22',
+            fill: true,
+            ...pointSettings,
+            pointBackgroundColor: dataValues.map(v => (warningThreshold && v >= warningThreshold ? '#ef4444' : color))
+        }];
+    }
+
+    if (chart) chart.destroy();
+    const ctx = canvas.getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#94a3b8' } },
+                x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+            },
+            plugins: { legend: { labels: { color: 'white' } } }
+        }
+    });
+}
+async function snapshotMetrics() {
+    const btn = document.getElementById('btn-snapshot');
+    const originalText = "CAPTURE CURRENT STATUS";
+    
+    // Desactivar solo durante la carga
+    btn.disabled = true;
+    btn.innerText = "CAPTURING";
+
+    try {
+        const response = await fetch('capture.php');
+        const newData = await response.json();
+
+        if (!globalData) globalData = [];
+        globalData.push(newData);
+        if (globalData.length > 30) globalData.shift();
+
+        // Identificar pestaña activa
+        let currentType = 'cpu';
+        if (chart && chart.data.datasets[0]) {
+            const label = chart.data.datasets[0].label.toLowerCase();
+            if (label.includes('rx') || label.includes('tx') || label.includes('kb')) currentType = 'net';
+            else if (label.includes('cpu')) currentType = 'cpu';
+            else if (label.includes('ram')) currentType = 'ram';
+            else if (label.includes('disk')) currentType = 'disk';
+            else if (label.includes('load')) currentType = 'load';
+            else if (label.includes('swap')) currentType = 'swap';
+        }
+
+        // Actualizar Tabla o Gráfica
+        const tableContainer = document.getElementById('table-container');
+        if (tableContainer && tableContainer.style.display === 'block') {
+            refreshProc();
+        } else {
+            showChart(currentType);
+        }
+
+        btn.innerText = "OK";
+        btn.style.backgroundColor = "#059669";
+
+    } catch (e) {
+        btn.innerText = "ERROR";
+        console.error(e);
+    }
+}
+function renderDockerContainers(containers, stats) {
+    return `
+        <table class="docker-table">
+            <tr>
+                <th>Nombre</th>
+                <th>Estado</th>
+                <th>CPU</th>
+                <th>RAM</th>
+                <th>Uptime</th>
+                <th>Acciones</th>
+            </tr>
+            ${containers.map(c => {
+                const s = stats.find(x => x.Name === c.Names) || {};
+                return `
+                    <tr>
+                        <td>${c.Names}</td>
+                        <td>${c.Status}</td>
+                        <td>${s.CPUPerc || '-'}</td>
+                        <td>${s.MemUsage || '-'}</td>
+                        <td>${c.RunningFor}</td>
+                        <td>
+                            <button class="btn-start" data-id="${c.ID}">Iniciar</button>
+                            <button class="btn-stop" data-id="${c.ID}">Parar</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('')}
+        </table>
+    `;
+}
+
+
+function renderDockerImages(images) {
+    return `
+        <table class="docker-table">
+            <tr>
+                <th>Imagen</th>
+                <th>Tamaño</th>
+                <th>ID</th>
+                <th>Acciones</th>
+            </tr>
+            ${images.map(i => `
+                <tr>
+                    <td>${i.Repository}:${i.Tag}</td>
+                    <td>${i.Size}</td>
+                    <td>${i.ID}</td>
+                    <td>
+                       <button class="btn-remove-image" data-id="${i.ID}">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('')}
+        </table>
+    `;
+}
+
+function sendDockerAction(action, target) {
+    const formData = new FormData();
+    formData.append("action", action);
+    formData.append("target", target);
+
+    // Opcional: Podrías poner un indicador de "Cargando..." aquí
+    
+    fetch("docker_info.php", {
+        method: "POST",
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (!data.ok) {
+            if (data.reason === "image_in_use") {
+                alert("No se puede eliminar: está siendo usada por contenedores.");
+            } else {
+                alert("Error: " + (data.error || "No se pudo realizar la acción"));
+            }
+            return;
+        }
+
+        // ¡ESTO ES LO IMPORTANTE!
+        // En lugar de obligar al usuario a darle a "OK" en un alert,
+        // refrescamos los datos inmediatamente.
+        loadDockerInfo(); 
+    })
+    .catch(err => {
+        console.error("Error en la petición:", err);
+        alert("Error de conexión con el servidor");
+    });
+}
+
+// Botones contenedores
+document.addEventListener("click", e => {
+    if (e.target.classList.contains("btn-start")) {
+        sendDockerAction("start", e.target.dataset.id);
+    }
+    if (e.target.classList.contains("btn-stop")) {
+        sendDockerAction("stop", e.target.dataset.id);
+    }
+});
+
+// Botones imágenes
+document.addEventListener("click", e => {
+    if (e.target.classList.contains("btn-remove-image")) {
+        if (confirm("¿Seguro que quieres borrar esta imagen?")) {
+            sendDockerAction("remove_image", e.target.dataset.id);
+        }
+    }
+});
+
+function loadDockerInfo() {
+    const container = document.getElementById('docker-container');
+    if (!container) return;
+
+    fetch('docker_info.php?t=' + new Date().getTime()) // Agregamos timestamp para evitar cache
+        .then(res => res.json())
+        .then(data => {
+            container.innerHTML = `
+                <h2 style="text-align:center; color:#3b82f6;">DOCKER</h2>
+                <h3>Contenedores</h3>
+                ${renderDockerContainers(data.containers, data.stats)}
+                <h3>Imágenes</h3>
+                ${renderDockerImages(data.images)}
+            `;
+        })
+        .catch(err => console.error("Error actualizando Docker:", err));
+}
+
+// Iniciar carga
+loadData();
+</script>
+</body>
+</html>

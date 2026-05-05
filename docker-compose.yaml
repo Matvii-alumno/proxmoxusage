@@ -1,0 +1,19 @@
+services:
+  web:
+    build: .
+    container_name: proxmox-web
+    privileged: true
+    user: root
+    pid: "host"
+    environment:
+      - HOSTNAME_REAL=${HOSTNAME}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    ports:
+      - "8085:80"
+    volumes:
+      - ./html:/var/www/html
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/hostname:/etc/host_hostname:ro
+
